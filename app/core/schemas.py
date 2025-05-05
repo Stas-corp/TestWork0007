@@ -7,18 +7,16 @@ class TaskStatus(str, Enum):
     pending = "pending"
     done = "done"
 
-# Auth
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
-    password: str
+    password: bytes
 
 class Token(BaseModel):
     access_token: str
     refresh_token: str
-    token_type: str = "bearer"
+    token_type: str = "Bearer"
 
-# Tasks
 class TaskBase(BaseModel):
     title: str
     description: Optional[str] = None
@@ -37,4 +35,4 @@ class TaskOut(TaskBase):
     owner_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
