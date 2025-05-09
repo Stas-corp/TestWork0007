@@ -3,19 +3,23 @@ from typing import Optional
 from enum import Enum
 from datetime import datetime
 
-class TaskStatus(str, Enum):
-    pending = "pending"
-    done = "done"
-
-class UserCreate(BaseModel):
+class UserSchema(BaseModel):
     name: str
     email: EmailStr
-    password: bytes
+    id: Optional[int] = None
+    password: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
 
 class Token(BaseModel):
     access_token: str
     refresh_token: str
-    token_type: str = "Bearer"
+    authorization: str = "Bearer"
+    
+class TaskStatus(str, Enum):
+    pending = "pending"
+    done = "done"
 
 class TaskBase(BaseModel):
     title: str

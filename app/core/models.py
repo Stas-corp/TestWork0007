@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Enum, LargeBinary
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 from .database import Base
@@ -13,7 +13,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100))
     email = Column(String(100), unique=True, index=True)
-    hashed_password = Column(String(255))
+    hashed_password = Column(LargeBinary(255))
 
     tasks = relationship("Task", back_populates="owner")
 

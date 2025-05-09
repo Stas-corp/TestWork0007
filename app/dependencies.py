@@ -1,9 +1,10 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.core import database, models
+from app.auth import utils as auth_utils
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+http_bearer = HTTPBearer()
 
 def get_db():
     db = database.SessionLocal()
@@ -11,16 +12,20 @@ def get_db():
         yield db
     finally:
         db.close()
+        
+def get_user_by_email(db: Session, email: str):
+    return db.query(models.User).filter(models.User.email == email).first()
 
-def get_current_user(
-    token: str = Depends(oauth2_scheme),
+def get_current_token_payload(
+    credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
+) -> models.User:
+    token = credentials.credentials
+    payload = auth_utils.decode_jwt(token)
+    return payload
+
+def get_current_auth_user(
+    payload: dict = Depends(get_current_token_payload),
     db: Session = Depends(get_db)
 ) -> models.User:
-    user = get_current_user(token, db)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorized",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
+    user_email = payload.get('sub')
+    return get_user_by_email(db, user_email)

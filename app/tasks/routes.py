@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.core import models, schemas
-from app.dependencies import get_db, get_current_user
+from app.dependencies import get_db, get_current_auth_user
 from datetime import datetime
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/tasks", tags=["Tasks"])
 def create_task(
     task: schemas.TaskCreate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_auth_user)
 ):
     db_task = models.Task(**task.model_dump(), owner_id=current_user.id)
     db.add(db_task)
@@ -26,7 +26,7 @@ def get_tasks(
     priority: Optional[int] = None,
     created_at: Optional[datetime] = None,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_auth_user)
 ):
     query = db.query(models.Task).filter(models.Task.owner_id == current_user.id)
     if status:
@@ -44,7 +44,7 @@ def update_task(
     task_id: int,
     task_data: schemas.TaskUpdate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_auth_user)
 ):
     task = db.query(models.Task).filter_by(id=task_id, owner_id=current_user.id).first()
     if not task:
@@ -61,7 +61,7 @@ def update_task(
 def search_tasks(
     q: str = Query(..., min_length=1),
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_auth_user)
 ):
     return db.query(models.Task).filter(
         models.Task.owner_id == current_user.id,

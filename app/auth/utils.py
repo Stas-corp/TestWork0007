@@ -2,9 +2,8 @@ import bcrypt
 import jwt
 
 from app.core.config import settings
-from app.core.schemas import UserCreate
+from app.core.schemas import UserSchema
 
-import uuid
 from datetime import datetime, timedelta, timezone
 
 TOKEN_TYPE_FIELD = "type"
@@ -26,8 +25,7 @@ def encode_jwt(
         expire = now + timedelta(minutes=expire_minutes)
     to_encode.update(
         exp=expire,
-        iat=now,
-        jti=str(uuid.uuid4()),
+        iat=now
     )
     encoded = jwt.encode(
         to_encode,
@@ -60,9 +58,9 @@ def create_jwt(
         expire_timedelta=expire_timedelta,
     )
 
-def create_access_token(user: UserCreate) -> str:
+def create_access_token(user: UserSchema) -> str:
     jwt_payload = {
-        "sub": user.name,
+        "sub": user.email,
         "username": user.name,
         "email": user.email,
     }
@@ -71,9 +69,9 @@ def create_access_token(user: UserCreate) -> str:
         token_data=jwt_payload,
     )
 
-def create_refresh_token(user: UserCreate) -> str:
+def create_refresh_token(user: UserSchema) -> str:
     jwt_payload = {
-        "sub": user.name,
+        "sub": user.email,
     }
     return create_jwt(
         token_type=REFRESH_TOKEN_TYPE,
