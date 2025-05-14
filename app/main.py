@@ -12,4 +12,4 @@ app.include_router(auth_routes.router)
 app.include_router(task_routes.router)
 
 if __name__ == "__main__":
-    uvicorn.run('app.main:app', reload=True)
+    uvicorn.run('app.main:app', reload=True, host='0.0.0.0')
