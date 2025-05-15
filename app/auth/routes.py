@@ -21,7 +21,7 @@ def authenticate_user(db: Session, email: str, password: str):
 
 @router.post("/register", response_model=schemas.Token)
 def register(
-    user_data: schemas.UserSchema, 
+    user_data: schemas.UserCreate, 
     db: Session = Depends(app_depend.get_db)
 ):
     if app_depend.get_user_by_email(db, user_data.email):
@@ -52,7 +52,6 @@ def login(
     user_data = schemas.UserSchema(
         name=user.name,
         email=user.email,
-        password=""
     )
     return {
         "access_token": auth_utils.create_access_token(user_data),
@@ -60,7 +59,7 @@ def login(
     }
 
 
-@router.post("/aboutme")
+@router.post("/aboutme", response_model=schemas.UserSchema)
 def auth_user_self_info(
     user: models.User = Depends(app_depend.get_current_auth_user)
 ):

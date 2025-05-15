@@ -12,14 +12,12 @@ class DbSettings(BaseModel):
     url: str = DATABASE_URL
     echo: bool = False
 
-
 class AuthJWT(BaseModel):
     private_key_path: Path = BASE_DIR / "certs" / "jwt_privet.pem"
     public_key_path: Path = BASE_DIR / "certs" / "jwt_public.pem"
     algorithm: str = "RS256"
     access_token_expire_minutes: int = 5
     refresh_token_expire_days: int = 1
-
 
 class Settings(BaseSettings):
     db: DbSettings = DbSettings()
